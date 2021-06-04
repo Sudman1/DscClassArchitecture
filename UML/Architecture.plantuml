@@ -1,0 +1,104 @@
+@startuml
+
+hide empty members
+
+package DscResource.Common <<folder>> {
+    abstract DscResourceBase << (B,#aaaaee) Base Class >> {
+        +Get()
+        +Set()
+        +Test()
+    }
+
+    class Test-DscParameterState << (F,#eeaaaa) Function >>
+    class ConvertTo-StringParameter << (F,#eeaaaa) Function >>
+    class ConvertFrom-StringParameter << (F,#eeaaaa) Function >>
+    class ConvertTo-HashtableFromObject << (F,#eeaaaa) Function >>
+}
+package "ApplicationDsc" <<folder>> {
+    package Classes <<folder>> {
+        class "ApplicationProperty : DscResourceBase" << Subclass >> {
+            +[System.String] $Prop1
+            +[System.String] $Prop2
+            +[System.Int32] $Prop3
+            +[System.Boolean] $Prop4
+            +[Ensure] $Ensure
+        }
+    }
+
+    package Public <<folder>> {
+        class Get-ApplicationProperty << (F,#eeaaaa) Function >> {
+            ~[System.TimeSpan] $Prop1
+            ~[System.String] $Prop2
+            ~[System.Int32] $Prop3
+            ~[System.Boolean] $Prop4
+            ~[Ensure] $Ensure
+        }
+
+        class Set-ApplicationProperty << (F,#eeaaaa) Function >> {
+            ~[System.TimeSpan] $Prop1
+            ~[System.String] $Prop2
+            ~[System.Int32] $Prop3
+            ~[System.Boolean] $Prop4
+            ~[Ensure] $Ensure
+        }
+    }
+}
+
+"ApplicationProperty : DscResourceBase" -[#0000FF]|> DscResourceBase
+
+
+DscResourceBase::Get --> "Get-ApplicationProperty"
+DscResourceBase::Set --> "Set-ApplicationProperty"
+
+DscResourceBase::Test --> "Test-DscParameterState"
+DscResourceBase::Test --> "ConvertTo-HashtableFromObject"
+
+DscResourceBase::Get --> "ConvertFrom-StringParameter"
+DscResourceBase::Set --> "ConvertTo-StringParameter"
+
+note top of "Set-ApplicationProperty"
+    The Set-* function must take the same number
+    of arguments with the same names as those used
+    in its class. However, the function should use 
+    correct object types. For instance: This Class
+    takes a [System.String] as the $Prop1 value.
+    But the Function takes a [System.TimeSpan]
+    <i>and performs input validation</i>.
+    The Convert*-StringProperty function is used
+    by the base class to handle the conversion
+    appropriately.
+end note
+
+note bottom of "Get-ApplicationProperty"
+    The Get() method from the base class passes
+    all properties to the Get-* function to pass
+    the object state for processing.
+
+    This function must return a hash table with
+    the same names and types as the sister Set-*
+    Function requires.
+end note
+
+note bottom of "ApplicationProperty : DscResourceBase"
+    <i>No input validation should be ovccuring here.</i>
+    All inut validation should be occuring on the Get-*
+    and Set-* functions.
+end note
+
+note  as ConvertNote
+    "A switch statement in these functions ensure any
+    Conversions from one type to another are processed
+    in a way that is compatible with DSC's processing
+    of parameters."
+end note
+
+"ConvertFrom-StringParameter" -- ConvertNote
+"ConvertTo-StringParameter" -- ConvertNote
+
+note top of DscResourceBase
+    Uses reflection to determine the class of $this
+    object and uses the name of the object to determine
+    the names of the Get-* and Set-* functions to call.
+end note
+
+@enduml

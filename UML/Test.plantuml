@@ -1,0 +1,46 @@
+@startuml
+
+participant "LCM"
+participant "Class\nApplicationProperty" #cceecc
+participant "Class\nDscResourceBase" #ccccee
+participant "Function\nConvertTo-HashtableFromObject" #ccccee
+participant "Function\nTest-DscParameterState" #ccccee
+
+"LCM" -> "Class\nApplicationProperty" : ApplicationProperty.Test()
+activate "Class\nApplicationProperty"
+
+"Class\nApplicationProperty" -> "Class\nDscResourceBase" : ([DscResourceBase] $this).Test()
+activate "Class\nDscResourceBase"
+
+"Class\nDscResourceBase" -> "Function\nConvertTo-HashtableFromObject" : $this
+activate "Function\nConvertTo-HashtableFromObject"
+
+"Function\nConvertTo-HashtableFromObject" -> "Class\nDscResourceBase" : Return Type: [Hashtable]
+deactivate "Function\nConvertTo-HashtableFromObject"
+
+"Class\nDscResourceBase" -> "Class\nDscResourceBase" : $actual = $this.Get()
+
+"Class\nDscResourceBase" -> "Function\nConvertTo-HashtableFromObject" : $actual
+activate "Function\nConvertTo-HashtableFromObject"
+
+"Function\nConvertTo-HashtableFromObject" -> "Class\nDscResourceBase" : Return Type: [Hashtable]
+deactivate "Function\nConvertTo-HashtableFromObject"
+
+"Class\nDscResourceBase" -> "Function\nTest-DscParameterState" : Parameter: both Hashtables
+note right
+    DscResourceBase must determine which properties
+    are optional to exclude them the comparison.
+end note
+activate "Function\nTest-DscParameterState"
+
+"Function\nTest-DscParameterState" -> "Class\nDscResourceBase" : Return Type: [Boolean]
+deactivate "Function\nTest-DscParameterState"
+
+"Class\nDscResourceBase" -> "Class\nApplicationProperty" : Return Type: [Boolean]
+deactivate "Class\nDscResourceBase"
+
+"Class\nApplicationProperty" -> LCM : Return Type: [Boolean]
+deactivate "Class\nApplicationProperty"
+
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+
+participant "LCM"
+participant "Class\nApplicationProperty" #cceecc
+participant "Class\nDscResourceBase" #ccccee
+participant "Function\nConvertFrom-StringParameter" #ccccee
+participant "Function\nSet-ApplicationProperty" #cceecc
+
+"LCM" -> "Class\nApplicationProperty" : ApplicationProperty.Set()
+activate "Class\nApplicationProperty"
+
+"Class\nApplicationProperty" -> "Class\nDscResourceBase" : ([DscResourceBase] $this).Set()
+activate "Class\nDscResourceBase"
+
+"Class\nDscResourceBase" -> "Function\nConvertFrom-StringParameter" : Parameter: [String]
+activate "Function\nConvertFrom-StringParameter"
+
+"Function\nConvertFrom-StringParameter" -> "Class\nDscResourceBase" : Return Type: [Correct Type]
+deactivate "Function\nConvertFrom-StringParameter"
+
+"Class\nDscResourceBase" -> "Function\nSet-ApplicationProperty" : ApplicationProperty fields as Parameters
+activate "Function\nSet-ApplicationProperty"
+note right
+    DscResourceBase uses $this.GetType()
+    to determine which function name to call.
+end note
+"Function\nSet-ApplicationProperty" -> "Class\nDscResourceBase" : [void]
+deactivate "Function\nSet-ApplicationProperty"
+
+"Class\nDscResourceBase" -> "Class\nApplicationProperty": [void]
+deactivate "Class\nDscResourceBase"
+
+"Class\nApplicationProperty" -> "LCM" : [void]
+deactivate "Class\nApplicationProperty"
+
+@enduml
