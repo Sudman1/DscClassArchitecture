@@ -51,7 +51,7 @@ class ResourceBase
         $resourceName = $this.GetType().Name
 
         # Converts properties to correct type if needed using ConvertFrom-StringParameter, basically converting PSBoundParameters
-        $modifiedProperties = ConvertFrom-StringParameter -Parameter $PSBoundParameters -DestinationFunctionName "Get-$ResourceName"
+        $modifiedProperties = ConvertFrom-StringParameter -Parameter $PSBoundParameters -DestinationFunctionName "Set-$ResourceName"
 
         # possibly determine if changes need to be made before setting?
 
